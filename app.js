@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -11,6 +13,40 @@ const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 var app = express();
 
+
+const url = 'mongodb://localhost:27017/';
+const dbname = 'conFusion';
+
+MongoClient.connect(url, (err, client) => {
+
+    assert.equal(err,null);
+
+    console.log('Connected correctly to server');
+
+    const db = client.db(dbname);
+    const collection = db.collection("dishes");
+    collection.insertOne({"name": "Uthappizza", "description": "test"},
+    (err, result) => {
+        assert.equal(err,null);
+
+        console.log("After Insert:\n");
+        console.log(result.ops);
+
+        collection.find({}).toArray((err, docs) => {
+            assert.equal(err,null);
+            
+            console.log("Found:\n");
+            console.log(docs);
+
+            db.dropCollection("dishes", (err, result) => {
+                assert.equal(err,null);
+
+                client.close();
+            });
+        });
+    });
+
+});
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
