@@ -36,11 +36,24 @@ connect.then((db) => {
     newDish.save()
         .then((dish) => {
             console.log(dish);
-            Dishes.find({}).exec();
+            Dishes.findByIdAndUpdate(dish._id, {
+                $set: {description: 'Updated test'}, new: true
+            }).exec();
         })
         .then((dishes) => {
             console.log(dishes);
-            return Dishes.remove({});
+
+            dish.comments.push({
+                rating: 5,
+                comment: 'test comment',
+                author: 'test author'
+            });
+
+            return dish.save();
+        })
+        .then((dish) => {
+            console.log(dish);
+            return Dish.remove({});
         })
         .then(() => {
             return mongoose.connection.close();
