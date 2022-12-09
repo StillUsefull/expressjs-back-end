@@ -6,12 +6,17 @@ var logger = require('morgan');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const dboper = require('./operations');
+const mongoose = require('mongoose');
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const leaderRouter = require('./routes/leaderRouter');
 const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
+
+const Dishes = require('./models/dishes');
+
 var app = express();
 
 
@@ -19,45 +24,33 @@ const url = 'mongodb://localhost:27017/';
 const dbname = 'conFusion';
 
 
+const connect = mongoose.connect(path.resolve(utl, dbname));
 
-MongoClient.connect(url).then((client) => {
+connect.then((db) => {
+    console.log('we connected to server');
 
-    console.log('Connected correctly to server');
-    const db = client.db(dbname);
-
-    dboper.insertDocument(db, { name: "Vadonut", description: "Test"},
-        "dishes")
-        .then((result) => {
-            console.log("Insert Document:\n", result.ops);
-
-            return dboper.findDocuments(db, "dishes");
+    let newDish = Dishes({
+        name: 'first dish',
+        description: 'test'
+    });
+    newDish.save()
+        .then((dish) => {
+            console.log(dish);
+            Dishes.find({}).exec();
         })
-        .then((docs) => {
-            console.log("Found Documents:\n", docs);
-
-            return dboper.updateDocument(db, { name: "Vadonut" },
-                    { description: "Updated Test" }, "dishes");
-
+        .then((dishes) => {
+            console.log(dishes);
+            return Dishes.remove({});
         })
-        .then((result) => {
-            console.log("Updated Document:\n", result.result);
-
-            return dboper.findDocuments(db, "dishes");
+        .then(() => {
+            return mongoose.connection.close();
         })
-        .then((docs) => {
-            console.log("Found Updated Documents:\n", docs);
-                            
-            return db.dropCollection("dishes");
+        .catch((err) => {
+            console.log(err.message);
         })
-        .then((result) => {
-            console.log("Dropped Collection: ", result);
+});
 
-            return client.close();
-        })
-        .catch((err) => console.log(err));
 
-})
-.catch((err) => console.log(err));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
