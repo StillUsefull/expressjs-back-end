@@ -3,7 +3,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const dboper = require('./operations');
 const mongoose = require('mongoose');
@@ -24,44 +23,11 @@ const url = 'mongodb://localhost:27017/';
 const dbname = 'conFusion';
 
 
-const connect = mongoose.connect(path.resolve(utl, dbname));
+const connect = mongoose.connect(path.resolve(url, dbname));
 
 connect.then((db) => {
-    console.log('we connected to server');
-
-    let newDish = Dishes({
-        name: 'first dish',
-        description: 'test'
-    });
-    newDish.save()
-        .then((dish) => {
-            console.log(dish);
-            Dishes.findByIdAndUpdate(dish._id, {
-                $set: {description: 'Updated test'}, new: true
-            }).exec();
-        })
-        .then((dishes) => {
-            console.log(dishes);
-
-            dish.comments.push({
-                rating: 5,
-                comment: 'test comment',
-                author: 'test author'
-            });
-
-            return dish.save();
-        })
-        .then((dish) => {
-            console.log(dish);
-            return Dish.remove({});
-        })
-        .then(() => {
-            return mongoose.connection.close();
-        })
-        .catch((err) => {
-            console.log(err.message);
-        })
-});
+    console.log("Connected correctly to server");
+}, (err) => { console.log(err); });
 
 
 // view engine setup
