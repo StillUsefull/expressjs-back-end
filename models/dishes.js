@@ -1,26 +1,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const commentSchema = new Schema({
-    rating: {
+var commentSchema = new Schema({
+    rating:  {
         type: Number,
         min: 1,
         max: 5,
         required: true
     },
-    comment: {
-        message: String,
+    comment:  {
+        type: String,
         required: true
     },
     author: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
-},
-{
+}, {
     timestamps: true
-}
-);
+});
 
 const dishSchema = new Schema({
     name: {
