@@ -45,9 +45,8 @@ app.all('*', (req, res, nxt) => {
   }
 });
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -60,35 +59,35 @@ app.use(session({
   resave: false,
   store: new FileStore()
 }));
-// app.use(session({secret: 'SECRET'}));
+app.use(session({secret: 'SECRET'}));
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', index);
 app.use('/users', users);
 
-// authentication before resource access
-// function auth(req, res, next) {
-//   // console.log(req.signedCookies);
-//   console.log(req.session);
 
-//   // if(!req.signedCookies.user){
-//   if(!req.user){  
-//     // var authHeader = req.headers.authorization;
-//     // if(!authHeader){
-//       var err = new Error('You are not authenticated!');
-//       // res.setHeader('WWW-Authenticate', 'Basic');
-//       err.status = 403;
-//       return next(err);
-//     }
-//     else {
-//       // if(req.signedCookies.user === 'admin'){ 
-//       next();     
-//     }
-// }
-// app.use(auth);
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+function auth(req, res, next) {
+console.log(req.signedCookies);
+console.log(req.session);
+
+if(!req.signedCookies.user){
+   if(!req.user){  
+      var authHeader = req.headers.authorization;
+      if(!authHeader){
+      var err = new Error('You are not authenticated!');
+        res.setHeader('WWW-Authenticate', 'Basic');
+      err.status = 403;
+       return next(err);
+    }
+    else {
+      if(req.signedCookies.user === 'admin'){ 
+      next();     
+    }
+}}}}
+
+app.use(auth);
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/dishes', dishRouter);
