@@ -8,19 +8,22 @@ const dboper = require('./operations');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
-
+var config = require('./config');
+const url = config.mongoUrl;
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const leaderRouter = require('./routes/leaderRouter');
 const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 
+
+
 const Dishes = require('./models/dishes');
 
 var app = express();
 
 
-const url = 'mongodb://localhost:27017/';
+
 const dbname = 'conFusion';
 
 
